@@ -13,6 +13,7 @@ class Photo(models.Model):
       title varchar2(20)
     )
     pk 에 해당하는 컬럼은 자동으로 생성
+    not null 컬럼으로 생성됨
     """
     title = models.CharField(max_length=50)
     author = models.CharField(max_length=50)
