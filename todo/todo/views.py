@@ -43,7 +43,7 @@ def todo_edit(request, id):
     todo = get_object_or_404(Todo, id=id)
     # todo = get_object_or_404(Todo,id=id)
     if request.method == "POST":
-        form = TodoForm(request.POST, instnace=todo)
+        form = TodoForm(request.POST, instance=todo)
         if form.is_valid():
             todo = form.save()
             return redirect("todo_detail", id=todo.id)
@@ -55,6 +55,7 @@ def todo_edit(request, id):
 
 def todo_done(request, id):
     # id와 일치하는 doto 찾기
+
     todo = Todo.objects.get(id=id)
     # post - 바인딩된 폼에 post 요청으로 넘어오는 값 담기
     todo.complete = True
