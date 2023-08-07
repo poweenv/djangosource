@@ -3,8 +3,15 @@ from .forms import UserForm
 
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
+
+
 # 로그인 처리 
 from django.contrib.auth import authenticate,login,logout
+
+# 비밀번호 변경
+from django.contrib.auth.forms import PasswordChangeForm
+from django.contrib.auth.views import PasswordChangeView
+from django.urls import reverse_lazy
 
 # Create your views here.
 def index(request):
@@ -40,6 +47,8 @@ def signup(request):
     return render(request,"users/register.html",{"form":form})
 
 def common_login(request):
+    # 개발자가 로그인을 직접 구현할 시
+    # 직접 구현하지 않고 장고가 제공하는 LoginView 사용 가능
     if request.method =="POST":
         # 사용자 입력값 가져오기
         username=request.POST["username"]
@@ -56,5 +65,42 @@ def common_login(request):
     return render(request, "users/login.html")
 
 def common_logout(request):
+    # 개발자가 로그인을 직접 구현할 시
+    # 직접 구현하지 않고 장고가 제공하는 LoginView 사용 가능
     logout(request)
     return redirect("index")
+
+"""
+장고에서 USER 작업 시
+django.contrib.auth.views 안에 정의된 여러 클래스들 사용 가능
+login => LoginView
+logout => LogoutView
+password 변경 => PasswordChangeView
+password 초기화 => PasswordResetView
+password 초기화를 위한 이메일 전송 => PasswordResetConfirm
+"""
+
+class CustomPasswordChangeView(PasswordChangeView):
+    """
+    PasswordChangeView에서 정의한 template_name 은
+    registration/password_change_form.html 을 찾게 되어 있음
+    success_url 은 password_change_done 으로 이동함
+    """
+    template_name = "users/password_change.html"
+    success_url = reverse_lazy("users:login")
+
+def common_password_change(request):
+    """
+    개발자가 직접 비밀번호 변경 구현 시
+    django 가 제공하는 PasswordChangeView 사용하면 편하게 비밀번호 변경 가능
+    """
+    if request.method=="POST":
+        form = PasswordChangeForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect("users:login")
+        
+    else:
+        form=PasswordChangeForm()
+
+    return render(request, "users/password_change.html",{"form":form})
